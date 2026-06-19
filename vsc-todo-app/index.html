@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChronoForge // Life & Productivity Console</title>
-    <!-- Chart.js for smooth data visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -336,7 +335,6 @@
         .mini-btn { background: #111214; border: 1px solid var(--border-color); color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem;}
         .reset-day-btn { background: transparent; color: var(--anime-pink); border: 1px solid rgba(255, 51, 102, 0.3); border-radius: 6px; padding: 8px; width: 100%; cursor: pointer; font-size: 0.85rem; font-weight: 600; margin-top: 5px; }
         
-        /* CLEANED PERSISTENT TOP HEADER BUTTON */
         .persistent-profile-trigger {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border-color);
@@ -365,7 +363,6 @@
             margin-bottom: 15px;
         }
 
-        /* ISOLATED LIST LAYOUT DETAILS METRICS */
         .profile-modal-item {
             display: flex;
             justify-content: space-between;
@@ -379,7 +376,6 @@
 
     <div class="app-wrapper">
         
-        <!-- SECURE SECURE REFACTORED AUTHENTICATION PORTAL -->
         <div id="authPortalScreen" class="auth-screen">
             <div class="auth-card">
                 <div class="app-branding-title">ChronoForge</div>
@@ -403,10 +399,8 @@
             </div>
         </div>
 
-        <!-- DASHBOARD WORKSPACE MAIN RUNTIME -->
         <div id="appRuntimeLayout" style="display:none; flex-direction:column; flex-grow:1;">
             
-            <!-- PERSISTENT APP HEADER ACROSS ALL INTERACTIVE NAVIGATION VIEWS -->
             <div class="app-persistent-header">
                 <div class="persistent-brand-text">CHRONOFORGE</div>
                 <div class="persistent-profile-trigger" onclick="openProfileIdentityDrawer()" title="View Active Account Parameters">👤</div>
@@ -431,19 +425,16 @@
 
             <div class="main-container" id="mainContainerBlock">
 
-                <!-- TAB 1: MY TASKS -->
                 <div id="panel-tasks" class="tab-panel active">
                     <div id="tasks-empty" class="empty-state"><div class="empty-illustration">✨</div><h2>All objectives clear</h2></div>
                     <div id="tasks-active-list"></div>
                 </div>
 
-                <!-- TAB 2: GOALS -->
                 <div id="panel-goals" class="tab-panel">
                     <div id="goals-empty" class="empty-state"><div class="empty-illustration">🏆</div><h2>No active legends set</h2></div>
                     <div id="goals-active-list"></div>
                 </div>
 
-                <!-- TAB 3: MEDIA LIBRARY -->
                 <div id="panel-media" class="tab-panel">
                     <div class="sub-filter-row">
                         <span class="filter-chip active" id="chip-All" onclick="switchMediaFilter('All')">All Media</span>
@@ -455,7 +446,6 @@
                     <div id="media-active-list"></div>
                 </div>
 
-                <!-- TAB 4: TRAINING ARC -->
                 <div id="panel-workout" class="tab-panel">
                     <div class="analytics-card" style="text-align: center; margin-bottom: 15px; border: 1px solid rgba(0, 255, 204, 0.15);">
                         <div style="font-size:0.85rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Chrono-Body Index</div>
@@ -497,7 +487,6 @@
                     <div id="workout-active-list" style="margin-top:15px;"></div>
                 </div>
 
-                <!-- TAB 5: RATIONS -->
                 <div id="panel-rations" class="tab-panel">
                     <div class="stat-grid-row">
                         <div class="stat-box"><div class="stat-val" id="waterCount">0 ml</div><div style="font-size:0.8rem; color:var(--text-muted)">Water</div><div class="stat-btn-row"><button class="mini-btn" onclick="adjustStat('water', 250)">+250ml</button></div></div>
@@ -512,7 +501,6 @@
 
         <button class="fab" id="globalActionFab" onclick="openDrawer()">+</button>
 
-        <!-- INPUT ACTION DRAWER MODAL -->
         <div class="modal-overlay" id="actionDrawer" onclick="closeDrawerOutside(event)">
             <div class="slide-drawer">
                 <h3 id="drawerTitle" style="color:var(--google-blue); margin-bottom:15px;">New Objective</h3>
@@ -524,7 +512,6 @@
             </div>
         </div>
 
-        <!-- REFACTORED USER IDENTITY DETAILS CARD MODAL DIALOG (PREVENTS ACCIDENTAL DISCONNECTS) -->
         <div class="modal-overlay" id="profileIdentityModal" onclick="closeProfileDrawerOutside(event)">
             <div class="slide-drawer" style="background-color: var(--google-card); border-top: 2px solid var(--border-color);">
                 <h3 style="color:var(--google-blue); margin: 0 0 20px 0; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Account Settings Matrix</h3>
@@ -569,6 +556,33 @@
         
         let db = { tasks: [], goals: [], media: [], workout: [], rations: [], stats: {} };
         let fitnessEvolutionChartInstance = null;
+
+        // BROWSER PUSH NOTIFICATION ENGINE INITIALIZATION
+        function requestSystemNotificationPermissions() {
+            if ("Notification" in window) {
+                Notification.requestPermission().then(permission => {
+                    console.log(`Notification token routing access status: ${permission}`);
+                });
+            }
+        }
+
+        function dispatchPriorityPushNotificationPayload(title, content, itemPriority = "Medium") {
+            if (!("Notification" in window) || Notification.permission !== "granted") return;
+            
+            let notificationOptions = {
+                body: content,
+                tag: "chrono-forge-alerts",
+                requireInteraction: itemPriority === "High" // Stays on screen if High priority
+            };
+
+            if (itemPriority === "High") {
+                new Notification(`🚨 CRITICAL: ${title}`, notificationOptions);
+            } else if (itemPriority === "Medium") {
+                new Notification(`⚡ ALERT: ${title}`, notificationOptions);
+            } else {
+                new Notification(title, notificationOptions);
+            }
+        }
 
         function toggleAuthenticationStateView() {
             const container = document.getElementById('authFormFieldsContainer');
@@ -665,6 +679,7 @@
                 currentAuthSessionEmail = emailInput;
                 localStorage.setItem('global_active_auth_email', emailInput);
                 loadDashboardWorkspace(cleanKeyBase);
+                requestSystemNotificationPermissions();
 
             } else {
                 const matchPass = localStorage.getItem(`usr_pass_${cleanKeyBase}`);
@@ -676,6 +691,7 @@
                 currentAuthSessionEmail = emailInput;
                 localStorage.setItem('global_active_auth_email', emailInput);
                 loadDashboardWorkspace(cleanKeyBase);
+                requestSystemNotificationPermissions();
             }
         }
 
@@ -720,7 +736,6 @@
             initFitnessProgressGraph();
         }
 
-        /* DRAWER CONTROLS FOR MODAL INFORMATION PANELS */
         function openProfileIdentityDrawer() {
             if (!currentProfileKey) return;
             
@@ -818,11 +833,14 @@
             renderTabLists();
         }
 
+        // TRIGGER PRIORITY PUSH PAYLOADS ON SYSTEM VALUES DATA UPDATES
         function adjustStat(field, val) {
             db.stats[field] = Math.max(0, (db.stats[field] || 0) + val);
             localStorage.setItem(`db_${currentProfileKey}_stats`, JSON.stringify(db.stats));
             syncStatDisplays();
             updateChartMetricsEngine();
+            
+            dispatchPriorityPushNotificationPayload("Metric Logged", `Successfully registered ${val >= 0 ? '+' : ''}${val} performance value under ${field}.`, "Low");
         }
 
         function resetMetricsArc(mode) {
@@ -831,6 +849,8 @@
             localStorage.setItem(`db_${currentProfileKey}_stats`, JSON.stringify(db.stats));
             syncStatDisplays();
             updateChartMetricsEngine();
+            
+            dispatchPriorityPushNotificationPayload("Arc Reset Complete", "Today's performance indicators have been synchronized back to base baseline matrices.", "Medium");
         }
 
         function syncStatDisplays() {
@@ -967,16 +987,21 @@
                 localStorage.setItem(`db_${currentProfileKey}_stats`, JSON.stringify(db.stats));
                 syncStatDisplays();
                 updateChartMetricsEngine();
+                dispatchPriorityPushNotificationPayload("Weight Logged", `Current baseline weight track set to ${wVal} kg.`, "Medium");
             } else if (activeTab === 'tasks') {
                 const txt = document.getElementById('taskTitle').value.trim();
                 const pVal = document.getElementById('taskPriority').value;
                 if (!txt) return;
                 db.tasks.push({ id: timestampID, text: txt, priority: pVal, completed: false });
+                
+                // Fire priority dynamic alert sequence
+                dispatchPriorityPushNotificationPayload("New Task Initialized", `[${pVal}] ${txt}`, pVal);
             } else if (activeTab === 'goals') {
                 const txt = document.getElementById('goalTitle').value.trim();
                 const dLine = document.getElementById('goalTargetTime').value;
                 if (!txt || !dLine) return;
                 db.goals.push({ id: timestampID, text: txt, targetEpoch: new Date(dLine).getTime(), completed: false });
+                dispatchPriorityPushNotificationPayload("Milestone Anchor Set", `New roadmap goal registered: ${txt}`, "High");
             } else if (activeTab === 'media') {
                 const txt = document.getElementById('mediaTitle').value.trim();
                 const tVal = document.getElementById('mediaType').value;
