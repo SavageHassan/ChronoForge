@@ -1,0 +1,33 @@
+{
+  "name": "vsc-todo-app",
+  "displayName": "Daily Life & Task Tracker",
+  "version": "1.0.0",
+  "publisher": "developer",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "activationEvents": [
+    "onView:lifeTaskWebview"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "life-task-tracker",
+          "title": "Life & Tasks",
+          "icon": "$(calendar)"
+        }
+      ]
+    },
+    "views": {
+      "life-task-tracker": [
+        {
+          "type": "webview",
+          "id": "lifeTaskWebview",
+          "name": "Dashboard"
+        }
+      ]
+    }
+  }
+}
