@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChronoForge // Life & Productivity Console</title>
+    <!-- Chart.js for smooth data visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -266,6 +267,7 @@
         .priority-Medium { background: rgba(255,204,0,0.15); color: var(--anime-gold); }
         .priority-Low { background: rgba(0,255,204,0.15); color: var(--anime-neon); }
         .anime-tag { font-size: 0.75rem; background: rgba(0, 255, 204, 0.1); color: var(--anime-neon); padding: 2px 6px; border-radius: 4px; width: fit-content; }
+        .alarm-indicator-tag { font-size: 0.75rem; background: rgba(255, 51, 102, 0.1); color: var(--anime-pink); padding: 2px 6px; border-radius: 4px; width: fit-content; display: inline-flex; align-items: center; gap: 4px; }
 
         .fab {
             position: fixed;
@@ -336,7 +338,7 @@
         .reset-day-btn { background: transparent; color: var(--anime-pink); border: 1px solid rgba(255, 51, 102, 0.3); border-radius: 6px; padding: 8px; width: 100%; cursor: pointer; font-size: 0.85rem; font-weight: 600; margin-top: 5px; }
         
         .persistent-profile-trigger {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(25, 26, 32, 0.6);
             border: 1px solid var(--border-color);
             color: var(--text-muted);
             border-radius: 50%;
@@ -370,12 +372,29 @@
             border-bottom: 1px dashed var(--border-color);
             font-size: 0.95rem;
         }
+        
+        .progress-track-wrapper {
+            background: #111214;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            height: 8px;
+            width: 100%;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            background: var(--google-blue);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
     </style>
 </head>
 <body>
 
     <div class="app-wrapper">
         
+        <!-- SECURE AUTHENTICATION PORTAL -->
         <div id="authPortalScreen" class="auth-screen">
             <div class="auth-card">
                 <div class="app-branding-title">ChronoForge</div>
@@ -399,6 +418,7 @@
             </div>
         </div>
 
+        <!-- DASHBOARD WORKSPACE MAIN RUNTIME -->
         <div id="appRuntimeLayout" style="display:none; flex-direction:column; flex-grow:1;">
             
             <div class="app-persistent-header">
@@ -417,7 +437,7 @@
 
             <div class="top-nav">
                 <span class="nav-item active" id="navTabLabelTasks" onclick="switchTab('tasks')">My Tasks</span>
-                <span class="nav-item" onclick="switchTab('goals')">Goals Arc</span>
+                <span class="nav-item" id="navTabLabelGoals" onclick="switchTab('goals')">Goals Arc</span>
                 <span class="nav-item" onclick="switchTab('media')">Media Library</span>
                 <span class="nav-item" onclick="switchTab('workout')">Training Arc</span>
                 <span class="nav-item" onclick="switchTab('rations')">Rations</span>
@@ -425,16 +445,23 @@
 
             <div class="main-container" id="mainContainerBlock">
 
+                <!-- TAB 1: MY TASKS -->
                 <div id="panel-tasks" class="tab-panel active">
                     <div id="tasks-empty" class="empty-state"><div class="empty-illustration">✨</div><h2>All objectives clear</h2></div>
                     <div id="tasks-active-list"></div>
                 </div>
 
+                <!-- TAB 2: GOALS -->
                 <div id="panel-goals" class="tab-panel">
+                    <div class="sub-filter-row">
+                        <span class="filter-chip active" id="goalChip-Daily" onclick="switchGoalFilter('Daily')">Daily Goals</span>
+                        <span class="filter-chip" id="goalChip-Legendary" onclick="switchGoalFilter('Legendary')">Long-Term Arc</span>
+                    </div>
                     <div id="goals-empty" class="empty-state"><div class="empty-illustration">🏆</div><h2>No active legends set</h2></div>
                     <div id="goals-active-list"></div>
                 </div>
 
+                <!-- TAB 3: MEDIA LIBRARY -->
                 <div id="panel-media" class="tab-panel">
                     <div class="sub-filter-row">
                         <span class="filter-chip active" id="chip-All" onclick="switchMediaFilter('All')">All Media</span>
@@ -446,6 +473,7 @@
                     <div id="media-active-list"></div>
                 </div>
 
+                <!-- TAB 4: TRAINING ARC WITH IMMERSIVE JOGGING ENGINE -->
                 <div id="panel-workout" class="tab-panel">
                     <div class="analytics-card" style="text-align: center; margin-bottom: 15px; border: 1px solid rgba(0, 255, 204, 0.15);">
                         <div style="font-size:0.85rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Chrono-Body Index</div>
@@ -477,6 +505,21 @@
                             <div class="stat-btn-row"><button class="mini-btn" onclick="adjustStat('cardio', 10)">+10m</button></div>
                         </div>
                     </div>
+                    
+                    <!-- NEW LOGARITHMIC JOGGING MODULE ROW -->
+                    <div class="stat-grid-row">
+                        <div class="stat-box" style="grid-column: span 2; border: 1px dashed rgba(255, 51, 102, 0.25);">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div style="text-align:left;">
+                                    <div class="stat-val" id="joggingCountDisplay" style="color:var(--anime-pink); margin:0;">0 mins</div>
+                                    <div style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Road Jogging Distance Track</div>
+                                </div>
+                                <div>
+                                    <button class="mini-btn" style="border-color:var(--anime-pink); color:white; padding:6px 14px;" onclick="adjustJoggingMetricDuration(10)">+10m Jog</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="analytics-card">
                         <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Performance Horizon Chart</div>
@@ -487,10 +530,21 @@
                     <div id="workout-active-list" style="margin-top:15px;"></div>
                 </div>
 
+                <!-- TAB 5: RATIONS -->
                 <div id="panel-rations" class="tab-panel">
                     <div class="stat-grid-row">
-                        <div class="stat-box"><div class="stat-val" id="waterCount">0 ml</div><div style="font-size:0.8rem; color:var(--text-muted)">Water</div><div class="stat-btn-row"><button class="mini-btn" onclick="adjustStat('water', 250)">+250ml</button></div></div>
-                        <div class="stat-box"><div class="stat-val" id="consumedDisplay">0 kcal</div><div style="font-size:0.8rem; color:var(--text-muted)">Consumed</div><div class="stat-btn-row"><button class="mini-btn" onclick="adjustStat('consumed', 200)">+200</button></div></div>
+                        <div class="stat-box">
+                            <div class="stat-val" id="waterCount">0 ml</div>
+                            <div style="font-size:0.8rem; color:var(--text-muted)" id="waterTargetLimitLabel">Water / -- ml</div>
+                            <div class="progress-track-wrapper"><div class="progress-bar-fill" id="waterProgressBarFill" style="background:var(--anime-neon)"></div></div>
+                            <div class="stat-btn-row" style="margin-top:12px;"><button class="mini-btn" onclick="adjustStat('water', 250)">+250ml</button></div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-val" id="consumedDisplay">0 kcal</div>
+                            <div style="font-size:0.8rem; color:var(--text-muted)" id="caloriesTargetLimitLabel">Consumed / -- kcal</div>
+                            <div class="progress-track-wrapper"><div class="progress-bar-fill" id="caloriesProgressBarFill" style="background:var(--anime-gold)"></div></div>
+                            <div class="stat-btn-row" style="margin-top:12px;"><button class="mini-btn" onclick="adjustStat('consumed', 200)">+200</button></div>
+                        </div>
                     </div>
                     <button class="reset-day-btn" onclick="resetMetricsArc('rations')">Reset Nutrition Stats</button>
                     <div id="rations-active-list" style="margin-top:15px;"></div>
@@ -501,6 +555,7 @@
 
         <button class="fab" id="globalActionFab" onclick="openDrawer()">+</button>
 
+        <!-- INPUT ACTION DRAWER MODAL -->
         <div class="modal-overlay" id="actionDrawer" onclick="closeDrawerOutside(event)">
             <div class="slide-drawer">
                 <h3 id="drawerTitle" style="color:var(--google-blue); margin-bottom:15px;">New Objective</h3>
@@ -512,6 +567,7 @@
             </div>
         </div>
 
+        <!-- USER IDENTITY DETAILS CARD MODAL DIALOG -->
         <div class="modal-overlay" id="profileIdentityModal" onclick="closeProfileDrawerOutside(event)">
             <div class="slide-drawer" style="background-color: var(--google-card); border-top: 2px solid var(--border-color);">
                 <h3 style="color:var(--google-blue); margin: 0 0 20px 0; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Account Settings Matrix</h3>
@@ -551,18 +607,20 @@
         let userHeightCm = null;
         let activeTab = "tasks";
         let activeMediaFilter = "All";
+        let activeGoalFilter = "Daily"; 
         let forceWeightMode = false;
         let currentAuthMode = "login";
         
         let db = { tasks: [], goals: [], media: [], workout: [], rations: [], stats: {} };
         let fitnessEvolutionChartInstance = null;
+        let waterHydrationAlertIntervalInstance = null;
 
-        // BROWSER PUSH NOTIFICATION ENGINE INITIALIZATION
+        let firedAlarmsRegistry = new Set();
+        let firedWarningsRegistry = new Set();
+
         function requestSystemNotificationPermissions() {
             if ("Notification" in window) {
-                Notification.requestPermission().then(permission => {
-                    console.log(`Notification token routing access status: ${permission}`);
-                });
+                Notification.requestPermission();
             }
         }
 
@@ -572,17 +630,62 @@
             let notificationOptions = {
                 body: content,
                 tag: "chrono-forge-alerts",
-                requireInteraction: itemPriority === "High" // Stays on screen if High priority
+                requireInteraction: itemPriority === "High"
             };
 
-            if (itemPriority === "High") {
-                new Notification(`🚨 CRITICAL: ${title}`, notificationOptions);
-            } else if (itemPriority === "Medium") {
-                new Notification(`⚡ ALERT: ${title}`, notificationOptions);
-            } else {
-                new Notification(title, notificationOptions);
-            }
+            new Notification(itemPriority === "High" ? `🚨 ${title}` : `⚡ ${title}`, notificationOptions);
         }
+
+        function startHydrationReminderTicker() {
+            if (waterHydrationAlertIntervalInstance) clearInterval(waterHydrationAlertIntervalInstance);
+            
+            waterHydrationAlertIntervalInstance = setInterval(() => {
+                dispatchPriorityPushNotificationPayload("Hydration Matrix Call", "40 minutes elapsed since checkpoint. Take a glass of water to maximize performance metrics.", "High");
+            }, 40 * 60 * 1000); 
+        }
+
+        function executeSystemAlarmChronometerLoop() {
+            if (!currentProfileKey || db.tasks.length === 0) return;
+            
+            const now = new Date();
+            const currentEpoch = now.getTime();
+
+            db.tasks.forEach(item => {
+                if (!item.alarmTime) return;
+
+                const [targetHours, targetMinutes] = item.alarmTime.split(":");
+                const alarmDateTarget = new Date();
+                alarmDateTarget.setHours(parseInt(targetHours), parseInt(targetMinutes), 0, 0);
+                
+                const alarmEpoch = alarmDateTarget.getTime();
+                const deltaMilliseconds = alarmEpoch - currentEpoch;
+
+                if (deltaMilliseconds <= 0 && deltaMilliseconds > -60000) {
+                    if (!firedAlarmsRegistry.has(item.id)) {
+                        firedAlarmsRegistry.add(item.id);
+                        dispatchPriorityPushNotificationPayload("ALARM BUZZER", `Time arrived for objective: ${item.text}`, "High");
+                        
+                        try {
+                            let beepContext = new (window.AudioContext || window.webkitAudioContext)();
+                            let oscillator = beepContext.createOscillator();
+                            oscillator.type = "sawtooth";
+                            oscillator.frequency.setValueAtTime(880, beepContext.currentTime);
+                            oscillator.connect(beepContext.destination);
+                            oscillator.start();
+                            oscillator.stop(beepContext.currentTime + 1.5);
+                        } catch(e) {}
+                    }
+                }
+                else if (deltaMilliseconds > 0 && deltaMilliseconds <= 1800000) {
+                    if (!firedWarningsRegistry.has(item.id)) {
+                        firedWarningsRegistry.add(item.id);
+                        let minutesRemaining = Math.ceil(deltaMilliseconds / 60000);
+                        dispatchPriorityPushNotificationPayload("Upcoming Objective", `"${item.text}" is scheduled to execute in ${minutesRemaining} minutes.`, "Medium");
+                    }
+                }
+            });
+        }
+        setInterval(executeSystemAlarmChronometerLoop, 2000);
 
         function toggleAuthenticationStateView() {
             const container = document.getElementById('authFormFieldsContainer');
@@ -673,7 +776,7 @@
                 localStorage.setItem(`usr_height_${cleanKeyBase}`, heightInput);
                 
                 localStorage.setItem(`db_${cleanKeyBase}_stats`, JSON.stringify({
-                    pushups: 0, cardio: 0, water: 0, weight: parseFloat(weightInput), burned: 0, consumed: 0
+                    pushups: 0, cardio: 0, water: 0, weight: parseFloat(weightInput), burned: 0, consumed: 0, jogging: 0
                 }));
 
                 currentAuthSessionEmail = emailInput;
@@ -697,6 +800,7 @@
 
         function showAuthError(msg) {
             const errorBlock = document.getElementById('authValidationFeedback');
+            errorBlock.style.trim;
             errorBlock.innerText = msg;
             errorBlock.style.display = 'block';
         }
@@ -722,7 +826,10 @@
             db.media = JSON.parse(localStorage.getItem(`db_${userKey}_media`)) || [];
             db.workout = JSON.parse(localStorage.getItem(`db_${userKey}_workout`)) || [];
             db.rations = JSON.parse(localStorage.getItem(`db_${userKey}_rations`)) || [];
-            db.stats = JSON.parse(localStorage.getItem(`db_${userKey}_stats`)) || { pushups: 0, cardio: 0, water: 0, weight: null, burned: 0, consumed: 0 };
+            db.stats = JSON.parse(localStorage.getItem(`db_${userKey}_stats`)) || { pushups: 0, cardio: 0, water: 0, weight: null, burned: 0, consumed: 0, jogging: 0 };
+
+            // Backup configuration for older profile schemas
+            if (db.stats.jogging === undefined) db.stats.jogging = 0;
 
             document.getElementById('authPortalScreen').classList.remove('active');
             document.getElementById('appRuntimeLayout').style.display = 'flex';
@@ -734,6 +841,7 @@
 
             renderTabLists();
             initFitnessProgressGraph();
+            startHydrationReminderTicker();
         }
 
         function openProfileIdentityDrawer() {
@@ -765,12 +873,16 @@
 
         function exitActiveSession() {
             closeProfileIdentityDrawer();
+            if (waterHydrationAlertIntervalInstance) clearInterval(waterHydrationAlertIntervalInstance);
+            
             localStorage.removeItem('global_active_auth_email');
             currentAuthSessionEmail = "";
             currentProfileKey = "";
             userBirthEpoch = null;
             userHeightCm = null;
             currentAuthMode = "login";
+            firedAlarmsRegistry.clear();
+            firedWarningsRegistry.clear();
             
             if(fitnessEvolutionChartInstance) { fitnessEvolutionChartInstance.destroy(); fitnessEvolutionChartInstance = null; }
             
@@ -815,7 +927,7 @@
 
         function switchTab(targetTab) {
             activeTab = targetTab;
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.top-nav .nav-item').forEach(el => el.classList.remove('active'));
             event.target.classList.add('active');
             
             document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
@@ -828,29 +940,46 @@
 
         function switchMediaFilter(type) {
             activeMediaFilter = type;
-            document.querySelectorAll('.filter-chip').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('#panel-media .filter-chip').forEach(el => el.classList.remove('active'));
             document.getElementById(`chip-${type}`).classList.add('active');
             renderTabLists();
         }
 
-        // TRIGGER PRIORITY PUSH PAYLOADS ON SYSTEM VALUES DATA UPDATES
+        function switchGoalFilter(type) {
+            activeGoalFilter = type;
+            document.querySelectorAll('#panel-goals .filter-chip').forEach(el => el.classList.remove('active'));
+            document.getElementById(`goalChip-${type}`).classList.add('active');
+            renderTabLists();
+        }
+
         function adjustStat(field, val) {
             db.stats[field] = Math.max(0, (db.stats[field] || 0) + val);
             localStorage.setItem(`db_${currentProfileKey}_stats`, JSON.stringify(db.stats));
             syncStatDisplays();
             updateChartMetricsEngine();
+        }
+
+        // CUSTOM ADJUSTMENT DRIVER LOGS FOR JOGGING TRACK DURATION VELOCITIES
+        function adjustJoggingMetricDuration(minutes) {
+            db.stats.jogging = Math.max(0, (db.stats.jogging || 0) + minutes);
             
-            dispatchPriorityPushNotificationPayload("Metric Logged", `Successfully registered ${val >= 0 ? '+' : ''}${val} performance value under ${field}.`, "Low");
+            // Core Algorithm Calculation: 11.4 kcal burned per minute continuous jogging
+            let extraBurnedKcal = Math.round(minutes * 11.4);
+            db.stats.burned = Math.max(0, (db.stats.burned || 0) + extraBurnedKcal);
+            
+            localStorage.setItem(`db_${currentProfileKey}_stats`, JSON.stringify(db.stats));
+            syncStatDisplays();
+            updateChartMetricsEngine();
+
+            dispatchPriorityPushNotificationPayload("Track Registered", `Recorded ${minutes} minutes of road jogging. Metabolic rate calculated: +${extraBurnedKcal} kcal burnout expenditure.`, "Low");
         }
 
         function resetMetricsArc(mode) {
-            if (mode === 'workout') { db.stats.burned = 0; db.stats.pushups = 0; db.stats.cardio = 0; } 
+            if (mode === 'workout') { db.stats.burned = 0; db.stats.pushups = 0; db.stats.cardio = 0; db.stats.jogging = 0; } 
             else { db.stats.consumed = 0; db.stats.water = 0; }
             localStorage.setItem(`db_${currentProfileKey}_stats`, JSON.stringify(db.stats));
             syncStatDisplays();
             updateChartMetricsEngine();
-            
-            dispatchPriorityPushNotificationPayload("Arc Reset Complete", "Today's performance indicators have been synchronized back to base baseline matrices.", "Medium");
         }
 
         function syncStatDisplays() {
@@ -861,6 +990,30 @@
             if (document.getElementById('burnedDisplay')) document.getElementById('burnedDisplay').innerText = (db.stats.burned || 0) + " kcal";
             if (document.getElementById('consumedDisplay')) document.getElementById('consumedDisplay').innerText = (db.stats.consumed || 0) + " kcal";
             
+            if (document.getElementById('joggingCountDisplay')) {
+                document.getElementById('joggingCountDisplay').innerText = `${db.stats.jogging || 0} mins`;
+            }
+
+            let ageYears = 25; 
+            if (userBirthEpoch) {
+                ageYears = new Date().getFullYear() - new Date(userBirthEpoch).getFullYear();
+            }
+
+            const calculatedWaterTarget = db.stats.weight ? Math.round(db.stats.weight * 35) : 2500;
+            const calculatedCaloriesTarget = db.stats.weight && userHeightCm ? Math.round((10 * db.stats.weight) + (6.25 * userHeightCm) - (5 * ageYears) + 5) : 2000;
+
+            if (document.getElementById('waterTargetLimitLabel')) {
+                document.getElementById('waterTargetLimitLabel').innerText = `Water / ${calculatedWaterTarget} ml`;
+                let waterPercent = Math.min(100, ((db.stats.water || 0) / calculatedWaterTarget) * 100);
+                document.getElementById('waterProgressBarFill').style.width = `${waterPercent}%`;
+            }
+
+            if (document.getElementById('caloriesTargetLimitLabel')) {
+                document.getElementById('caloriesTargetLimitLabel').innerText = `Consumed / ${calculatedCaloriesTarget} kcal`;
+                let calPercent = Math.min(100, ((db.stats.consumed || 0) / calculatedCaloriesTarget) * 100);
+                document.getElementById('caloriesProgressBarFill').style.width = `${calPercent}%`;
+            }
+
             if(userHeightCm && db.stats.weight) {
                 let heightMeters = userHeightCm / 100;
                 let calculatedBMI = (db.stats.weight / (heightMeters * heightMeters)).toFixed(1);
@@ -888,14 +1041,15 @@
             fitnessEvolutionChartInstance = new Chart(chartCanvas.getContext('2d'), {
                 type: 'line',
                 data: {
-                    labels: ['Pushups', 'Cardio (m)', 'Burned (x10 kcal)', 'Weight (kg)'],
+                    labels: ['Pushups', 'Cardio (m)', 'Burned (x10 kcal)', 'Weight (kg)', 'Jogging (m)'],
                     datasets: [{
                         label: 'Active Session Value',
                         data: [
                             db.stats.pushups || 0,
                             db.stats.cardio || 0,
                             (db.stats.burned || 0) / 10,
-                            db.stats.weight || 0
+                            db.stats.weight || 0,
+                            db.stats.jogging || 0
                         ],
                         borderColor: '#1a73e8',
                         backgroundColor: 'rgba(26, 115, 232, 0.1)',
@@ -929,7 +1083,8 @@
                 db.stats.pushups || 0,
                 db.stats.cardio || 0,
                 (db.stats.burned || 0) / 10,
-                db.stats.weight || 0
+                db.stats.weight || 0,
+                db.stats.jogging || 0
             ];
             fitnessEvolutionChartInstance.update();
         }
@@ -949,13 +1104,21 @@
                 container.innerHTML = `
                     <input type="text" id="taskTitle" placeholder="Task description..." />
                     <select id="taskPriority"><option value="Low">Low</option><option value="Medium" selected>Medium</option><option value="High">High</option></select>
+                    <label style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">Set Scheduler Alarm Time:</label>
+                    <input type="time" id="taskAlarmTimeField" />
                 `;
             } else if (activeTab === 'goals') {
                 title.innerText = "Launch New Goal Objective";
                 container.innerHTML = `
-                    <input type="text" id="goalTitle" placeholder="Enter target milestone goal..." />
-                    <label style="font-size:0.8rem; color:var(--text-muted)">Target Achievement Deadline:</label>
-                    <input type="datetime-local" id="goalTargetTime" />
+                    <select id="goalScopeField" onchange="toggleGoalInputFields(this.value)">
+                        <option value="Daily" ${activeGoalFilter === 'Daily' ? 'selected' : ''}>Daily Target</option>
+                        <option value="Legendary" ${activeGoalFilter === 'Legendary' ? 'selected' : ''}>Long-Term Arc</option>
+                    </select>
+                    <input type="text" id="goalTitle" placeholder="Enter objective milestone..." />
+                    <div id="goalTimeInputWrapper" style="display:${activeGoalFilter === 'Daily' ? 'none' : 'block'}; flex-direction:column; gap:4px;">
+                        <label style="font-size:0.8rem; color:var(--text-muted)">Target Achievement Deadline:</label>
+                        <input type="datetime-local" id="goalTargetTime" />
+                    </div>
                 `;
             } else if (activeTab === 'media') {
                 title.innerText = "Log Media Tracking Sequence";
@@ -975,6 +1138,10 @@
             document.getElementById('actionDrawer').classList.add('open');
         }
 
+        function toggleGoalInputFields(val) {
+            document.getElementById('goalTimeInputWrapper').style.display = (val === 'Daily') ? 'none' : 'block';
+        }
+
         function closeDrawer() { document.getElementById('actionDrawer').classList.remove('open'); forceWeightMode = false; }
         function closeDrawerOutside(e) { if(e.target.id === 'actionDrawer') closeDrawer(); }
 
@@ -987,21 +1154,31 @@
                 localStorage.setItem(`db_${currentProfileKey}_stats`, JSON.stringify(db.stats));
                 syncStatDisplays();
                 updateChartMetricsEngine();
-                dispatchPriorityPushNotificationPayload("Weight Logged", `Current baseline weight track set to ${wVal} kg.`, "Medium");
             } else if (activeTab === 'tasks') {
                 const txt = document.getElementById('taskTitle').value.trim();
                 const pVal = document.getElementById('taskPriority').value;
+                const alarmTimeInput = document.getElementById('taskAlarmTimeField').value;
                 if (!txt) return;
-                db.tasks.push({ id: timestampID, text: txt, priority: pVal, completed: false });
                 
-                // Fire priority dynamic alert sequence
-                dispatchPriorityPushNotificationPayload("New Task Initialized", `[${pVal}] ${txt}`, pVal);
+                db.tasks.push({ 
+                    id: timestampID, 
+                    text: txt, 
+                    priority: pVal, 
+                    alarmTime: alarmTimeInput || null, 
+                    completed: false 
+                });
             } else if (activeTab === 'goals') {
                 const txt = document.getElementById('goalTitle').value.trim();
-                const dLine = document.getElementById('goalTargetTime').value;
-                if (!txt || !dLine) return;
-                db.goals.push({ id: timestampID, text: txt, targetEpoch: new Date(dLine).getTime(), completed: false });
-                dispatchPriorityPushNotificationPayload("Milestone Anchor Set", `New roadmap goal registered: ${txt}`, "High");
+                const scope = document.getElementById('goalScopeField').value;
+                if (!txt) return;
+
+                if (scope === "Daily") {
+                    db.goals.push({ id: timestampID, text: txt, type: "Daily", targetEpoch: null, completed: false });
+                } else {
+                    const dLine = document.getElementById('goalTargetTime').value;
+                    if (!dLine) return;
+                    db.goals.push({ id: timestampID, text: txt, type: "Legendary", targetEpoch: new Date(dLine).getTime(), completed: false });
+                }
             } else if (activeTab === 'media') {
                 const txt = document.getElementById('mediaTitle').value.trim();
                 const tVal = document.getElementById('mediaType').value;
@@ -1026,6 +1203,10 @@
         function deleteItem(id, targetBucket) {
             db[targetBucket] = db[targetBucket].filter(item => item.id !== id);
             localStorage.setItem(`db_${currentProfileKey}_${targetBucket}`, JSON.stringify(db[targetBucket]));
+            
+            firedAlarmsRegistry.delete(id);
+            firedWarningsRegistry.delete(id);
+            
             renderTabLists();
         }
 
@@ -1042,11 +1223,18 @@
                 db.tasks.forEach(item => {
                     const card = document.createElement('div');
                     card.className = 'task-card';
+                    
+                    let alarmDisplayTag = "";
+                    if(item.alarmTime) {
+                        alarmDisplayTag = `<span class="alarm-indicator-tag">⏰ ${item.alarmTime}</span>`;
+                    }
+
                     card.innerHTML = `
                         <div class="task-content-block">
-                            <div style="display:flex; gap:8px; align-items:center;">
+                            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
                                 <span class="task-title-text">${item.text}</span>
                                 <span class="priority-indicator priority-${item.priority}">${item.priority}</span>
+                                ${alarmDisplayTag}
                             </div>
                         </div>
                         <span style="cursor:pointer; opacity:0.4;" onclick="deleteItem(${item.id}, 'tasks')">✕</span>
@@ -1112,31 +1300,39 @@
             const container = document.getElementById('goals-active-list');
             if (!container) return;
             container.innerHTML = "";
-            if(db.goals.length === 0) { document.getElementById('goals-empty').style.display = 'flex'; return; }
+            
+            let filteredGoals = db.goals.filter(item => {
+                if (activeGoalFilter === "Daily") return item.type === "Daily" || !item.type;
+                return item.type === "Legendary";
+            });
+
+            if(filteredGoals.length === 0) { document.getElementById('goals-empty').style.display = 'flex'; return; }
 
             const now = Date.now();
 
-            db.goals.forEach(item => {
+            filteredGoals.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'task-card';
                 
-                let diff = item.targetEpoch - now;
                 let countdownText = "";
-                
-                if (diff <= 0) {
-                    countdownText = "⚠️ TARGET LIMIT EXCEEDED / OVERDUE";
+                if (item.type === "Legendary" && item.targetEpoch) {
+                    let diff = item.targetEpoch - now;
+                    if (diff <= 0) {
+                        countdownText = `<span class="goal-countdown" style="background:rgba(255,51,102,0.1); color:var(--anime-pink);">⚠️ OVERDUE</span>`;
+                    } else {
+                        let d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                        let h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        countdownText = `<span class="goal-countdown">⏳ ${d}d ${h}h ${m}m remaining</span>`;
+                    }
                 } else {
-                    let d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                    let h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                    let s = Math.floor((diff % (1000 * 60)) / 1000);
-                    countdownText = `⏳ ${d}d ${h}h ${m}m ${s}s remaining`;
+                    countdownText = `<span class="goal-countdown" style="background:rgba(0,255,204,0.1); color:var(--anime-neon);">⚡ Focus Routine Objective</span>`;
                 }
 
                 card.innerHTML = `
                     <div class="task-content-block">
                         <span class="task-title-text" style="font-weight:600;">${item.text}</span>
-                        <span class="goal-countdown">${countdownText}</span>
+                        <div style="margin-top:4px;">${countdownText}</div>
                     </div>
                     <span style="cursor:pointer; opacity:0.4;" onclick="deleteItem(${item.id}, 'goals')">✕</span>
                 `;
@@ -1144,7 +1340,6 @@
             });
         }
 
-        // Run persistent session auth router check on load
         verifyStickyProfileRouter();
     </script>
 </body>
