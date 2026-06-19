@@ -42,7 +42,7 @@
             padding-bottom: 90px;
         }
 
-        /* SEPARATE CONFIGURATION PROFILE SCREEN */
+        /* ONBOARDING SCREEN */
         .onboarding-screen {
             display: none;
             padding: 40px 20px;
@@ -127,6 +127,7 @@
             background-color: var(--google-blue);
         }
 
+        /* SUB-FILTERS */
         .sub-filter-row {
             display: flex;
             gap: 8px;
@@ -201,29 +202,6 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
 
-        .check-circle {
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--text-muted);
-            border-radius: 50%;
-            cursor: pointer;
-            margin-top: 2px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .check-circle:checked {
-            background-color: var(--google-blue);
-            border-color: var(--google-blue);
-        }
-        .check-circle:checked::after {
-            content: "✓";
-            color: white;
-            font-size: 11px;
-            font-weight: bold;
-        }
-
         .task-content-block {
             flex-grow: 1;
             display: flex;
@@ -232,63 +210,13 @@
         }
 
         .task-title-text { font-size: 0.98rem; font-weight: 400; }
-        .task-title-text.done { text-decoration: line-through; color: var(--text-muted); }
-
-        .meta-stamp {
-            font-size: 0.78rem;
-            color: var(--anime-pink);
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .goal-countdown {
-            font-size: 0.8rem;
-            color: var(--anime-gold);
-            font-family: monospace;
-            background: rgba(255, 204, 0, 0.1);
-            padding: 2px 6px;
-            border-radius: 4px;
-            width: fit-content;
-            margin-top: 4px;
-        }
-
-        .priority-indicator {
-            font-size: 0.7rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: bold;
-            width: fit-content;
-        }
+        .meta-stamp { font-size: 0.78rem; color: var(--anime-pink); display: inline-flex; align-items: center; gap: 4px; }
+        .goal-countdown { font-size: 0.8rem; color: var(--anime-gold); font-family: monospace; background: rgba(255, 204, 0, 0.1); padding: 2px 6px; border-radius: 4px; width: fit-content; margin-top: 4px; }
+        .priority-indicator { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; width: fit-content; }
         .priority-High { background: rgba(255,51,102,0.15); color: var(--anime-pink); }
         .priority-Medium { background: rgba(255,204,0,0.15); color: var(--anime-gold); }
         .priority-Low { background: rgba(0,255,204,0.15); color: var(--anime-neon); }
-
-        .anime-tag {
-            font-size: 0.75rem;
-            background: rgba(0, 255, 204, 0.1);
-            color: var(--anime-neon);
-            padding: 2px 6px;
-            border-radius: 4px;
-            width: fit-content;
-        }
-
-        .collapsible-container {
-            margin-top: 20px;
-            border-top: 1px solid var(--border-color);
-            padding-top: 10px;
-        }
-
-        .collapsible-trigger {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 0.9rem;
-            color: var(--text-main);
-            cursor: pointer;
-            padding: 8px 0;
-            font-weight: 500;
-        }
+        .anime-tag { font-size: 0.75rem; background: rgba(0, 255, 204, 0.1); color: var(--anime-neon); padding: 2px 6px; border-radius: 4px; width: fit-content; }
 
         .fab {
             position: fixed;
@@ -334,7 +262,6 @@
             border-top-right-radius: 20px;
             padding: 24px;
             box-sizing: border-box;
-            animation: slideUp 0.25s cubic-bezier(0, 0, 0.2, 1);
         }
 
         .drawer-inputs { display: flex; flex-direction: column; gap: 12px; }
@@ -358,16 +285,13 @@
         .stat-btn-row { display: flex; justify-content: center; gap: 8px; margin-top: 8px;}
         .mini-btn { background: #111214; border: 1px solid var(--border-color); color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem;}
         .reset-day-btn { background: transparent; color: var(--anime-pink); border: 1px solid rgba(255, 51, 102, 0.3); border-radius: 6px; padding: 8px; width: 100%; cursor: pointer; font-size: 0.85rem; font-weight: 600; margin-top: 5px; }
-
-        @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div class="app-wrapper">
         
-        <!-- INITIAL PROFILE CONFIGURATION SEPARATE SCREEN -->
+        <!-- INITIAL PROFILE SETUP -->
         <div id="onboardingPortal" class="onboarding-screen">
             <div class="onboarding-card">
                 <h2 style="margin-top:0; color:var(--google-blue);">Initialize Control Center</h2>
@@ -380,7 +304,7 @@
             </div>
         </div>
 
-        <!-- APP RUNTIME INTERFACE -->
+        <!-- APP RUNTIME LAYOUT -->
         <div id="appRuntimeLayout" style="display:none; flex-direction:column; flex-grow:1;">
             <div class="giant-clock-container">
                 <div class="giant-time" id="giantSystemClock">00:00:00</div>
@@ -388,7 +312,7 @@
             </div>
 
             <div style="padding: 15px 20px 0 20px;">
-                <div class="age-tracker-banner" id="chronoBanner">SYNCING LIFE LINE...</div>
+                <div class="age-tracker-banner" id="chronoBanner">YOUR AGE: LOADING...</div>
             </div>
 
             <div class="top-nav">
@@ -399,7 +323,7 @@
                 <span class="nav-item" onclick="switchTab('rations')">Rations</span>
             </div>
 
-            <div class="main-container id" id="mainContainerBlock">
+            <div class="main-container" id="mainContainerBlock">
 
                 <!-- TAB 1: MY TASKS -->
                 <div id="panel-tasks" class="tab-panel active">
@@ -407,9 +331,9 @@
                     <div id="tasks-active-list"></div>
                 </div>
 
-                <!-- TAB 2: GOALS WITH LIVE COUNTER TIMERS -->
+                <!-- TAB 2: GOALS -->
                 <div id="panel-goals" class="tab-panel">
-                    <div id="goals-empty" class="empty-state"><div class="empty-illustration">🏆</div><h2>No active legends set</h2><p>Commit a multi-day objective goal.</p></div>
+                    <div id="goals-empty" class="empty-state"><div class="empty-illustration">🏆</div><h2>No active legends set</h2></div>
                     <div id="goals-active-list"></div>
                 </div>
 
@@ -425,17 +349,34 @@
                     <div id="media-active-list"></div>
                 </div>
 
-                <!-- TAB 4: TRAINING ARC -->
+                <!-- TAB 4: TRAINING ARC (CARDS CONTAINER PROPERLY LOCKED HERE) -->
                 <div id="panel-workout" class="tab-panel">
                     <div class="stat-grid-row">
-                        <div class="stat-box"><div class="stat-val" id="weightDisplay">-- kg</div><div style="font-size:0.8rem; color:var(--text-muted)">Weight</div><div class="stat-btn-row"><button class="mini-btn" onclick="openWeightModal()">Log</button></div></div>
-                        <div class="stat-box"><div class="stat-val" id="burnedDisplay">0 kcal</div><div style="font-size:0.8rem; color:var(--text-muted)">Burned</div><div class="stat-btn-row"><button class="mini-btn" onclick="adjustStat('burned', 100)">+100</button></div></div>
+                        <div class="stat-box">
+                            <div class="stat-val" id="weightDisplay">-- kg</div>
+                            <div style="font-size:0.8rem; color:var(--text-muted)">Weight</div>
+                            <div class="stat-btn-row"><button class="mini-btn" onclick="openWeightModal()">Log</button></div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-val" id="burnedDisplay">0 kcal</div>
+                            <div style="font-size:0.8rem; color:var(--text-muted)">Burned</div>
+                            <div class="stat-btn-row"><button class="mini-btn" onclick="adjustStat('burned', 100)">+100</button></div>
+                        </div>
                     </div>
                     <div class="stat-grid-row">
-                        <div class="stat-box"><div class="stat-val" id="pushupsCount">0</div><div style="font-size:0.8rem; color:var(--text-muted)">Pushups</div><div class="stat-btn-row"><button class="mini-btn" onclick="adjustStat('pushups', 5)">+5</button></div></div>
-                        <div class="stat-box"><div class="stat-val" id="cardioCount">0m</div><div style="font-size:0.8rem; color:var(--text-muted)">Cardio</div><div class="stat-btn-row"><button class="mini-btn" onclick="adjustStat('cardio', 10)">+10m</button></div></div>
+                        <div class="stat-box">
+                            <div class="stat-val" id="pushupsCount">0</div>
+                            <div style="font-size:0.8rem; color:var(--text-muted)">Pushups</div>
+                            <div class="stat-btn-row"><button class="mini-btn" onclick="adjustStat('pushups', 5)">+5</button></div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-val" id="cardioCount">0m</div>
+                            <div style="font-size:0.8rem; color:var(--text-muted)">Cardio</div>
+                            <div class="stat-btn-row"><button class="mini-btn" onclick="adjustStat('cardio', 10)">+10m</button></div>
+                        </div>
                     </div>
                     <button class="reset-day-btn" onclick="resetMetricsArc('workout')">Reset Training Stats</button>
+                    <div id="workout-active-list" style="margin-top:15px;"></div>
                 </div>
 
                 <!-- TAB 5: RATIONS -->
@@ -445,6 +386,7 @@
                         <div class="stat-box"><div class="stat-val" id="consumedDisplay">0 kcal</div><div style="font-size:0.8rem; color:var(--text-muted)">Consumed</div><div class="stat-btn-row"><button class="mini-btn" onclick="adjustStat('consumed', 200)">+200</button></div></div>
                     </div>
                     <button class="reset-day-btn" onclick="resetMetricsArc('rations')">Reset Nutrition Stats</button>
+                    <div id="rations-active-list" style="margin-top:15px;"></div>
                 </div>
 
             </div>
@@ -452,7 +394,7 @@
 
         <button class="fab" id="globalActionFab" onclick="openDrawer()">+</button>
 
-        <!-- DROPDOWN DRAWER -->
+        <!-- DRAWER MODAL -->
         <div class="modal-overlay" id="actionDrawer" onclick="closeDrawerOutside(event)">
             <div class="slide-drawer">
                 <h3 id="drawerTitle" style="color:var(--google-blue); margin-bottom:15px;">New Objective</h3>
@@ -517,7 +459,6 @@
                     `${years}Y - ${months}M - ${days}D - ${hoursStr}H - ${minutesStr}M - ${secondsStr}S`;
             }
             
-            // Render Live Countdown Timers for Goals
             if (activeTab === 'goals') renderGoalsCountdownEngine();
         }
         setInterval(updateChronoClock, 1000);
@@ -651,7 +592,6 @@
 
         function renderTabLists() {
             document.getElementById('tasks-empty').style.display = 'none';
-            document.getElementById('goals-empty').style.display = 'none';
 
             if (activeTab === 'tasks') {
                 const activeContainer = document.getElementById('tasks-active-list');
@@ -703,7 +643,7 @@
             const container = document.getElementById('goals-active-list');
             if (!container) return;
             container.innerHTML = "";
-            if(db.goals.length === 0) { document.getElementById('goals-empty').style.display = 'flex'; return; }
+            if(db.goals.length === 0) return;
 
             const now = Date.now();
 
