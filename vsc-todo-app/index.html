@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Life & Productivity Tracker Console</title>
+    <title>ChronoForge // Life & Productivity Console</title>
+    <!-- Chart.js for smooth data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --google-bg: #111214;
@@ -42,8 +44,8 @@
             padding-bottom: 90px;
         }
 
-        /* ONBOARDING SCREEN */
-        .onboarding-screen {
+        /* PRODUCTION AUTH PORTAL MODAL DESIGN */
+        .auth-screen {
             display: none;
             padding: 40px 20px;
             text-align: center;
@@ -53,23 +55,70 @@
             min-height: 80vh;
             gap: 20px;
         }
-        .onboarding-screen.active { display: flex; }
+        .auth-screen.active { display: flex; }
 
-        .onboarding-card {
+        .auth-card {
             background: var(--google-card);
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            padding: 30px;
+            padding: 35px 30px;
             width: 100%;
             box-sizing: border-box;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 25px rgba(0,0,0,0.4);
         }
 
-        /* GIANT SYSTEM CLOCK */
+        .app-branding-title {
+            font-family: 'SF Mono', Consolas, monospace;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0 0 5px 0;
+            letter-spacing: -1px;
+            text-shadow: 0 0 15px rgba(26, 115, 232, 0.4);
+        }
+
+        /* PERSISTENT RUNTIME TOP HEAD HEADER BAR */
+        .app-persistent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #16171b;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .persistent-brand-text {
+            font-family: 'SF Mono', Consolas, monospace;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            text-shadow: 0 0 10px rgba(26, 115, 232, 0.3);
+        }
+
+        .auth-error-feedback {
+            color: var(--anime-pink);
+            font-size: 0.82rem;
+            margin-top: 8px;
+            display: none;
+            font-weight: 500;
+            text-align: left;
+        }
+
+        .toggle-auth-link {
+            font-size: 0.85rem;
+            color: var(--google-blue);
+            cursor: pointer;
+            margin-top: 15px;
+            display: inline-block;
+            text-decoration: underline;
+        }
+
+        /* RUNTIME LAYOUT CLOCK EXECUTIONS */
         .giant-clock-container {
             background: linear-gradient(180deg, #16171b 0%, #111214 100%);
             border-bottom: 1px solid var(--border-color);
-            padding: 25px 20px;
+            padding: 20px 20px 25px 20px;
             text-align: center;
         }
 
@@ -127,7 +176,6 @@
             background-color: var(--google-blue);
         }
 
-        /* SUB-FILTERS */
         .sub-filter-row {
             display: flex;
             gap: 8px;
@@ -159,6 +207,9 @@
             display: none;
         }
         .main-container.active { display: block; }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
 
         .age-tracker-banner {
             background: rgba(25, 26, 32, 0.4);
@@ -210,7 +261,6 @@
         }
 
         .task-title-text { font-size: 0.98rem; font-weight: 400; }
-        .meta-stamp { font-size: 0.78rem; color: var(--anime-pink); display: inline-flex; align-items: center; gap: 4px; }
         .goal-countdown { font-size: 0.8rem; color: var(--anime-gold); font-family: monospace; background: rgba(255, 204, 0, 0.1); padding: 2px 6px; border-radius: 4px; width: fit-content; margin-top: 4px; }
         .priority-indicator { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; width: fit-content; }
         .priority-High { background: rgba(255,51,102,0.15); color: var(--anime-pink); }
@@ -285,38 +335,94 @@
         .stat-btn-row { display: flex; justify-content: center; gap: 8px; margin-top: 8px;}
         .mini-btn { background: #111214; border: 1px solid var(--border-color); color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem;}
         .reset-day-btn { background: transparent; color: var(--anime-pink); border: 1px solid rgba(255, 51, 102, 0.3); border-radius: 6px; padding: 8px; width: 100%; cursor: pointer; font-size: 0.85rem; font-weight: 600; margin-top: 5px; }
+        
+        /* CLEANED PERSISTENT TOP HEADER BUTTON */
+        .persistent-profile-trigger {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        .persistent-profile-trigger:hover {
+            background: rgba(26, 115, 232, 0.2);
+            color: white;
+            border-color: var(--google-blue);
+        }
+
+        .analytics-card {
+            background-color: var(--google-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 15px;
+        }
+
+        /* ISOLATED LIST LAYOUT DETAILS METRICS */
+        .profile-modal-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--border-color);
+            font-size: 0.95rem;
+        }
     </style>
 </head>
 <body>
 
     <div class="app-wrapper">
         
-        <!-- INITIAL PROFILE SETUP -->
-        <div id="onboardingPortal" class="onboarding-screen">
-            <div class="onboarding-card">
-                <h2 style="margin-top:0; color:var(--google-blue);">Initialize Control Center</h2>
-                <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:25px;">Please provide your birth matrix to synchronize the chrono engine.</p>
+        <!-- SECURE SECURE REFACTORED AUTHENTICATION PORTAL -->
+        <div id="authPortalScreen" class="auth-screen">
+            <div class="auth-card">
+                <div class="app-branding-title">ChronoForge</div>
+                <p style="color:var(--text-muted); font-size:0.88rem; margin: 0 0 25px 0; letter-spacing: 0.3px;">Forge your timeline. Master your daily milestones.</p>
+                
                 <div class="drawer-inputs">
-                    <label style="text-align:left; font-size:0.85rem; color:var(--text-muted)">Select Birth Date:</label>
-                    <input type="date" id="portalBirthPicker" />
-                    <button class="submit-btn" style="width:100%; margin-top:10px;" onclick="initializeUserProfile()">Synchronize Engine</button>
+                    <div id="authFormFieldsContainer" class="drawer-inputs">
+                        <label style="text-align:left; font-size:0.85rem; color:var(--text-muted)">Account Email Address:</label>
+                        <input type="email" id="authEmailField" placeholder="name@example.com" />
+
+                        <label style="text-align:left; font-size:0.85rem; color:var(--text-muted)">Security Password:</label>
+                        <input type="password" id="authPasswordField" placeholder="••••••••" />
+                    </div>
+
+                    <div class="auth-error-feedback" id="authValidationFeedback">Fallback warning text</div>
+                    
+                    <button class="submit-btn" style="width:100%; margin-top:15px;" id="authSubmitActionButton" onclick="executeAuthenticationAction()">Login to Console</button>
                 </div>
+                
+                <div class="toggle-auth-link" id="authToggleStateLink" onclick="toggleAuthenticationStateView()">Need a new tracking footprint? Sign Up</div>
             </div>
         </div>
 
-        <!-- APP RUNTIME LAYOUT -->
+        <!-- DASHBOARD WORKSPACE MAIN RUNTIME -->
         <div id="appRuntimeLayout" style="display:none; flex-direction:column; flex-grow:1;">
+            
+            <!-- PERSISTENT APP HEADER ACROSS ALL INTERACTIVE NAVIGATION VIEWS -->
+            <div class="app-persistent-header">
+                <div class="persistent-brand-text">CHRONOFORGE</div>
+                <div class="persistent-profile-trigger" onclick="openProfileIdentityDrawer()" title="View Active Account Parameters">👤</div>
+            </div>
+
             <div class="giant-clock-container">
                 <div class="giant-time" id="giantSystemClock">00:00:00</div>
                 <div class="giant-date" id="giantSystemDate">SYSTEM CALENDAR</div>
             </div>
 
             <div style="padding: 15px 20px 0 20px;">
-                <div class="age-tracker-banner" id="chronoBanner">YOUR AGE: LOADING...</div>
+                <div class="age-tracker-banner" id="chronoBanner">SYNCING MASTER PARAMETERS...</div>
             </div>
 
             <div class="top-nav">
-                <span class="nav-item active" onclick="switchTab('tasks')">My Tasks</span>
+                <span class="nav-item active" id="navTabLabelTasks" onclick="switchTab('tasks')">My Tasks</span>
                 <span class="nav-item" onclick="switchTab('goals')">Goals Arc</span>
                 <span class="nav-item" onclick="switchTab('media')">Media Library</span>
                 <span class="nav-item" onclick="switchTab('workout')">Training Arc</span>
@@ -349,8 +455,14 @@
                     <div id="media-active-list"></div>
                 </div>
 
-                <!-- TAB 4: TRAINING ARC (CARDS CONTAINER PROPERLY LOCKED HERE) -->
+                <!-- TAB 4: TRAINING ARC -->
                 <div id="panel-workout" class="tab-panel">
+                    <div class="analytics-card" style="text-align: center; margin-bottom: 15px; border: 1px solid rgba(0, 255, 204, 0.15);">
+                        <div style="font-size:0.85rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Chrono-Body Index</div>
+                        <div class="stat-val" id="bmiOutputDisplay" style="font-size: 2.2rem; color: var(--anime-neon); margin: 6px 0 2px 0;">--</div>
+                        <div id="bmiLabelStatus" style="font-size:0.78rem; color:var(--text-muted)">Loading tracking stats...</div>
+                    </div>
+
                     <div class="stat-grid-row">
                         <div class="stat-box">
                             <div class="stat-val" id="weightDisplay">-- kg</div>
@@ -375,6 +487,12 @@
                             <div class="stat-btn-row"><button class="mini-btn" onclick="adjustStat('cardio', 10)">+10m</button></div>
                         </div>
                     </div>
+
+                    <div class="analytics-card">
+                        <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Performance Horizon Chart</div>
+                        <canvas id="metricsEvolutionChart" width="100%" height="60"></canvas>
+                    </div>
+
                     <button class="reset-day-btn" onclick="resetMetricsArc('workout')">Reset Training Stats</button>
                     <div id="workout-active-list" style="margin-top:15px;"></div>
                 </div>
@@ -394,7 +512,7 @@
 
         <button class="fab" id="globalActionFab" onclick="openDrawer()">+</button>
 
-        <!-- DRAWER MODAL -->
+        <!-- INPUT ACTION DRAWER MODAL -->
         <div class="modal-overlay" id="actionDrawer" onclick="closeDrawerOutside(event)">
             <div class="slide-drawer">
                 <h3 id="drawerTitle" style="color:var(--google-blue); margin-bottom:15px;">New Objective</h3>
@@ -405,32 +523,248 @@
                 </div>
             </div>
         </div>
+
+        <!-- REFACTORED USER IDENTITY DETAILS CARD MODAL DIALOG (PREVENTS ACCIDENTAL DISCONNECTS) -->
+        <div class="modal-overlay" id="profileIdentityModal" onclick="closeProfileDrawerOutside(event)">
+            <div class="slide-drawer" style="background-color: var(--google-card); border-top: 2px solid var(--border-color);">
+                <h3 style="color:var(--google-blue); margin: 0 0 20px 0; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Account Settings Matrix</h3>
+                
+                <div style="display:flex; flex-direction:column; gap:4px; margin-bottom:20px;">
+                    <div class="profile-modal-item">
+                        <span style="color:var(--text-muted)">Profile Handle:</span>
+                        <span style="font-weight:600; color:var(--anime-neon);" id="modalDisplayHandle">--</span>
+                    </div>
+                    <div class="profile-modal-item">
+                        <span style="color:var(--text-muted)">Email Address:</span>
+                        <span style="color:white; font-family:monospace;" id="modalDisplayEmail">--</span>
+                    </div>
+                    <div class="profile-modal-item">
+                        <span style="color:var(--text-muted)">Height Spec:</span>
+                        <span style="color:white;" id="modalDisplayHeight">-- cm</span>
+                    </div>
+                    <div class="profile-modal-item">
+                        <span style="color:var(--text-muted)">Body Matrix BMI:</span>
+                        <span style="color:var(--anime-gold); font-weight:600;" id="modalDisplayBMI">--</span>
+                    </div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <button class="reset-day-btn" style="background-color: rgba(255, 51, 102, 0.1); border-color: var(--anime-pink);" onclick="exitActiveSession()">Sign Out / Switch Session</button>
+                    <button class="text-btn" style="color:var(--text-muted); font-weight:500;" onclick="closeProfileIdentityDrawer()">Dismiss Panel</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        let userBirthEpoch = localStorage.getItem('global_user_birthday_epoch') || null;
+        let currentAuthSessionEmail = localStorage.getItem('global_active_auth_email') || "";
+        let currentProfileKey = "";
+        let userBirthEpoch = null;
+        let userHeightCm = null;
+        let activeTab = "tasks";
+        let activeMediaFilter = "All";
+        let forceWeightMode = false;
+        let currentAuthMode = "login";
+        
+        let db = { tasks: [], goals: [], media: [], workout: [], rations: [], stats: {} };
+        let fitnessEvolutionChartInstance = null;
 
-        function checkSystemAuthentication() {
-            if (!userBirthEpoch) {
-                document.getElementById('onboardingPortal').classList.add('active');
-                document.getElementById('appRuntimeLayout').style.display = 'none';
-                document.getElementById('globalActionFab').classList.remove('active');
-                document.getElementById('mainContainerBlock').classList.remove('active');
+        function toggleAuthenticationStateView() {
+            const container = document.getElementById('authFormFieldsContainer');
+            const actionBtn = document.getElementById('authSubmitActionButton');
+            const toggleLink = document.getElementById('authToggleStateLink');
+            const errorBlock = document.getElementById('authValidationFeedback');
+            
+            errorBlock.style.display = 'none';
+            container.innerHTML = "";
+
+            if (currentAuthMode === "login") {
+                currentAuthMode = "signup";
+                actionBtn.innerText = "Forge New Account";
+                toggleLink.innerText = "Already registered? Access Login Portal";
+                
+                container.innerHTML = `
+                    <label style="text-align:left; font-size:0.85rem; color:var(--text-muted)">Profile Handle Name:</label>
+                    <input type="text" id="authNameField" placeholder="e.g. Mubeen" />
+
+                    <label style="text-align:left; font-size:0.85rem; color:var(--text-muted)">Email Address:</label>
+                    <input type="email" id="authEmailField" placeholder="name@example.com" />
+
+                    <label style="text-align:left; font-size:0.85rem; color:var(--text-muted)">Password Key:</label>
+                    <input type="password" id="authPasswordField" placeholder="••••••••" />
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>
+                            <label style="text-align:left; display:block; font-size:0.85rem; color:var(--text-muted); margin-top:5px;">Height (cm):</label>
+                            <input type="number" id="authHeightField" placeholder="e.g. 178" style="width:100%; box-sizing:border-box;" />
+                        </div>
+                        <div>
+                            <label style="text-align:left; display:block; font-size:0.85rem; color:var(--text-muted); margin-top:5px;">Weight (kg):</label>
+                            <input type="number" step="0.1" id="authWeightField" placeholder="e.g. 70" style="width:100%; box-sizing:border-box;" />
+                        </div>
+                    </div>
+
+                    <label style="text-align:left; font-size:0.85rem; color:var(--text-muted); margin-top:5px;">Your Birth Matrix Date:</label>
+                    <input type="date" id="authBirthField" />
+                `;
             } else {
-                document.getElementById('onboardingPortal').classList.remove('active');
-                document.getElementById('appRuntimeLayout').style.display = 'flex';
-                document.getElementById('globalActionFab').classList.add('active');
-                document.getElementById('mainContainerBlock').classList.add('active');
-                renderTabLists();
+                currentAuthMode = "login";
+                actionBtn.innerText = "Login to Console";
+                toggleLink.innerText = "Need a new tracking footprint? Sign Up";
+                
+                container.innerHTML = `
+                    <label style="text-align:left; font-size:0.85rem; color:var(--text-muted)">Account Email Address:</label>
+                    <input type="email" id="authEmailField" placeholder="name@example.com" />
+
+                    <label style="text-align:left; font-size:0.85rem; color:var(--text-muted)">Security Password:</label>
+                    <input type="password" id="authPasswordField" placeholder="••••••••" />
+                `;
             }
         }
 
-        function initializeUserProfile() {
-            const chosenDate = document.getElementById('portalBirthPicker').value;
-            if (!chosenDate) return;
-            localStorage.setItem('global_user_birthday_epoch', new Date(chosenDate).getTime());
-            userBirthEpoch = new Date(chosenDate).getTime();
-            checkSystemAuthentication();
+        function executeAuthenticationAction() {
+            const errorBlock = document.getElementById('authValidationFeedback');
+            errorBlock.style.display = 'none';
+
+            const emailInput = document.getElementById('authEmailField').value.trim().toLowerCase();
+            const passwordInput = document.getElementById('authPasswordField').value.trim();
+
+            if (!emailInput || !passwordInput) {
+                showAuthError("Fallback Scenario: All credential parameters must be populated.");
+                return;
+            }
+
+            const cleanKeyBase = btoa(emailInput).replace(/=/g, "");
+
+            if (currentAuthMode === "signup") {
+                const nameInput = document.getElementById('authNameField').value.trim();
+                const heightInput = document.getElementById('authHeightField').value.trim();
+                const weightInput = document.getElementById('authWeightField').value.trim();
+                const birthInput = document.getElementById('authBirthField').value;
+
+                if (!nameInput || !heightInput || !weightInput || !birthInput) {
+                    showAuthError("Fallback Scenario: Complete profile registration matrix options.");
+                    return;
+                }
+
+                if (localStorage.getItem(`usr_pass_${cleanKeyBase}`)) {
+                    showAuthError("Validation Error: This email footprint already exists.");
+                    return;
+                }
+
+                localStorage.setItem(`usr_pass_${cleanKeyBase}`, passwordInput);
+                localStorage.setItem(`usr_name_${cleanKeyBase}`, nameInput);
+                localStorage.setItem(`usr_dob_${cleanKeyBase}`, birthInput);
+                localStorage.setItem(`usr_height_${cleanKeyBase}`, heightInput);
+                
+                localStorage.setItem(`db_${cleanKeyBase}_stats`, JSON.stringify({
+                    pushups: 0, cardio: 0, water: 0, weight: parseFloat(weightInput), burned: 0, consumed: 0
+                }));
+
+                currentAuthSessionEmail = emailInput;
+                localStorage.setItem('global_active_auth_email', emailInput);
+                loadDashboardWorkspace(cleanKeyBase);
+
+            } else {
+                const matchPass = localStorage.getItem(`usr_pass_${cleanKeyBase}`);
+                if (!matchPass || matchPass !== passwordInput) {
+                    showAuthError("Security Failure: Invalid combination of Email and Password.");
+                    return;
+                }
+
+                currentAuthSessionEmail = emailInput;
+                localStorage.setItem('global_active_auth_email', emailInput);
+                loadDashboardWorkspace(cleanKeyBase);
+            }
+        }
+
+        function showAuthError(msg) {
+            const errorBlock = document.getElementById('authValidationFeedback');
+            errorBlock.innerText = msg;
+            errorBlock.style.display = 'block';
+        }
+
+        function verifyStickyProfileRouter() {
+            if (currentAuthSessionEmail) {
+                const cleanKeyBase = btoa(currentAuthSessionEmail).replace(/=/g, "");
+                if (localStorage.getItem(`usr_pass_${cleanKeyBase}`)) {
+                    loadDashboardWorkspace(cleanKeyBase);
+                    return;
+                }
+            }
+            document.getElementById('authPortalScreen').classList.add('active');
+        }
+
+        function loadDashboardWorkspace(userKey) {
+            currentProfileKey = userKey;
+            userBirthEpoch = new Date(localStorage.getItem(`usr_dob_${userKey}`)).getTime();
+            userHeightCm = parseFloat(localStorage.getItem(`usr_height_${userKey}`));
+
+            db.tasks = JSON.parse(localStorage.getItem(`db_${userKey}_tasks`)) || [];
+            db.goals = JSON.parse(localStorage.getItem(`db_${userKey}_goals`)) || [];
+            db.media = JSON.parse(localStorage.getItem(`db_${userKey}_media`)) || [];
+            db.workout = JSON.parse(localStorage.getItem(`db_${userKey}_workout`)) || [];
+            db.rations = JSON.parse(localStorage.getItem(`db_${userKey}_rations`)) || [];
+            db.stats = JSON.parse(localStorage.getItem(`db_${userKey}_stats`)) || { pushups: 0, cardio: 0, water: 0, weight: null, burned: 0, consumed: 0 };
+
+            document.getElementById('authPortalScreen').classList.remove('active');
+            document.getElementById('appRuntimeLayout').style.display = 'flex';
+            document.getElementById('globalActionFab').classList.add('active');
+            document.getElementById('mainContainerBlock').classList.add('active');
+
+            const profileFriendlyName = localStorage.getItem(`usr_name_${userKey}`) || "User";
+            document.getElementById('navTabLabelTasks').innerText = `${profileFriendlyName}'s Tasks`;
+
+            renderTabLists();
+            initFitnessProgressGraph();
+        }
+
+        /* DRAWER CONTROLS FOR MODAL INFORMATION PANELS */
+        function openProfileIdentityDrawer() {
+            if (!currentProfileKey) return;
+            
+            const handleName = localStorage.getItem(`usr_name_${currentProfileKey}`) || "N/A";
+            const height = userHeightCm ? userHeightCm + " cm" : "N/A";
+            
+            let bmiVal = "--";
+            if (userHeightCm && db.stats.weight) {
+                bmiVal = (db.stats.weight / ((userHeightCm / 100) * (userHeightCm / 100))).toFixed(1);
+            }
+
+            document.getElementById('modalDisplayHandle').innerText = handleName;
+            document.getElementById('modalDisplayEmail').innerText = currentAuthSessionEmail;
+            document.getElementById('modalDisplayHeight').innerText = height;
+            document.getElementById('modalDisplayBMI').innerText = bmiVal;
+
+            document.getElementById('profileIdentityModal').classList.add('open');
+        }
+
+        function closeProfileIdentityDrawer() {
+            document.getElementById('profileIdentityModal').classList.remove('open');
+        }
+
+        function closeProfileDrawerOutside(e) {
+            if (e.target.id === 'profileIdentityModal') closeProfileIdentityDrawer();
+        }
+
+        function exitActiveSession() {
+            closeProfileIdentityDrawer();
+            localStorage.removeItem('global_active_auth_email');
+            currentAuthSessionEmail = "";
+            currentProfileKey = "";
+            userBirthEpoch = null;
+            userHeightCm = null;
+            currentAuthMode = "login";
+            
+            if(fitnessEvolutionChartInstance) { fitnessEvolutionChartInstance.destroy(); fitnessEvolutionChartInstance = null; }
+            
+            document.getElementById('appRuntimeLayout').style.display = 'none';
+            document.getElementById('globalActionFab').classList.remove('active');
+            document.getElementById('mainContainerBlock').classList.remove('active');
+            
+            document.getElementById('authPortalScreen').classList.add('active');
+            toggleAuthenticationStateView();
         }
 
         function updateChronoClock() {
@@ -454,27 +788,15 @@
                 if (days < 0) { days += new Date(now.getFullYear(), now.getMonth(), 0).getDate(); months--; }
                 if (months < 0) { months += 12; years--; }
 
+                const displayName = localStorage.getItem(`usr_name_${currentProfileKey}`) || "USER";
                 document.getElementById('chronoBanner').innerHTML = 
-                    `<span style="color:var(--text-muted); font-weight:bold; margin-right:5px;">YOUR AGE:</span>` +
+                    `<span style="color:var(--anime-neon); font-weight:bold; margin-right:5px;">${displayName.toUpperCase()}'S AGE:</span>` +
                     `${years}Y - ${months}M - ${days}D - ${hoursStr}H - ${minutesStr}M - ${secondsStr}S`;
             }
             
             if (activeTab === 'goals') renderGoalsCountdownEngine();
         }
         setInterval(updateChronoClock, 1000);
-
-        let activeTab = "tasks";
-        let activeMediaFilter = "All";
-        let forceWeightMode = false;
-
-        let db = {
-            tasks: JSON.parse(localStorage.getItem('prod_db_tasks')) || [],
-            goals: JSON.parse(localStorage.getItem('prod_db_goals')) || [],
-            media: JSON.parse(localStorage.getItem('prod_db_media')) || [],
-            workout: JSON.parse(localStorage.getItem('prod_db_workout')) || [],
-            rations: JSON.parse(localStorage.getItem('prod_db_rations')) || [],
-            stats: JSON.parse(localStorage.getItem('prod_db_stats')) || { pushups: 0, cardio: 0, water: 0, weight: null, burned: 0, consumed: 0 }
-        };
 
         function switchTab(targetTab) {
             activeTab = targetTab;
@@ -484,6 +806,9 @@
             document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
             document.getElementById(`panel-${targetTab}`).classList.add('active');
             renderTabLists();
+            if(targetTab === 'workout') {
+                setTimeout(initFitnessProgressGraph, 50);
+            }
         }
 
         function switchMediaFilter(type) {
@@ -495,24 +820,98 @@
 
         function adjustStat(field, val) {
             db.stats[field] = Math.max(0, (db.stats[field] || 0) + val);
-            localStorage.setItem('prod_db_stats', JSON.stringify(db.stats));
+            localStorage.setItem(`db_${currentProfileKey}_stats`, JSON.stringify(db.stats));
             syncStatDisplays();
+            updateChartMetricsEngine();
         }
 
         function resetMetricsArc(mode) {
             if (mode === 'workout') { db.stats.burned = 0; db.stats.pushups = 0; db.stats.cardio = 0; } 
             else { db.stats.consumed = 0; db.stats.water = 0; }
-            localStorage.setItem('prod_db_stats', JSON.stringify(db.stats));
+            localStorage.setItem(`db_${currentProfileKey}_stats`, JSON.stringify(db.stats));
             syncStatDisplays();
+            updateChartMetricsEngine();
         }
 
         function syncStatDisplays() {
-            document.getElementById('pushupsCount').innerText = db.stats.pushups || 0;
-            document.getElementById('cardioCount').innerText = (db.stats.cardio || 0) + "m";
-            document.getElementById('waterCount').innerText = (db.stats.water || 0) + " ml";
-            document.getElementById('weightDisplay').innerText = (db.stats.weight ? db.stats.weight + " kg" : "-- kg");
-            document.getElementById('burnedDisplay').innerText = (db.stats.burned || 0) + " kcal";
-            document.getElementById('consumedDisplay').innerText = (db.stats.consumed || 0) + " kcal";
+            if (document.getElementById('pushupsCount')) document.getElementById('pushupsCount').innerText = db.stats.pushups || 0;
+            if (document.getElementById('cardioCount')) document.getElementById('cardioCount').innerText = (db.stats.cardio || 0) + "m";
+            if (document.getElementById('waterCount')) document.getElementById('waterCount').innerText = (db.stats.water || 0) + " ml";
+            if (document.getElementById('weightDisplay')) document.getElementById('weightDisplay').innerText = (db.stats.weight ? db.stats.weight + " kg" : "-- kg");
+            if (document.getElementById('burnedDisplay')) document.getElementById('burnedDisplay').innerText = (db.stats.burned || 0) + " kcal";
+            if (document.getElementById('consumedDisplay')) document.getElementById('consumedDisplay').innerText = (db.stats.consumed || 0) + " kcal";
+            
+            if(userHeightCm && db.stats.weight) {
+                let heightMeters = userHeightCm / 100;
+                let calculatedBMI = (db.stats.weight / (heightMeters * heightMeters)).toFixed(1);
+                document.getElementById('bmiOutputDisplay').innerText = calculatedBMI;
+                
+                let evaluationLabel = "Normal weight";
+                let evaluationColor = "var(--anime-neon)";
+                if(calculatedBMI < 18.5) { evaluationLabel = "Underweight"; evaluationColor = "var(--anime-gold)"; }
+                else if(calculatedBMI >= 25 && calculatedBMI < 30) { evaluationLabel = "Overweight"; evaluationColor = "var(--anime-gold)"; }
+                else if(calculatedBMI >= 30) { evaluationLabel = "Obese matrix"; evaluationColor = "var(--anime-pink)"; }
+                
+                document.getElementById('bmiLabelStatus').innerHTML = `<span style="color:${evaluationColor}; font-weight:600;">${evaluationLabel}</span> profile context evaluated`;
+            } else {
+                document.getElementById('bmiOutputDisplay').innerText = "--";
+                document.getElementById('bmiLabelStatus').innerText = "Log current weight metrics to evaluate index";
+            }
+        }
+
+        function initFitnessProgressGraph() {
+            const chartCanvas = document.getElementById('metricsEvolutionChart');
+            if(!chartCanvas) return;
+            
+            if(fitnessEvolutionChartInstance) fitnessEvolutionChartInstance.destroy();
+            
+            fitnessEvolutionChartInstance = new Chart(chartCanvas.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['Pushups', 'Cardio (m)', 'Burned (x10 kcal)', 'Weight (kg)'],
+                    datasets: [{
+                        label: 'Active Session Value',
+                        data: [
+                            db.stats.pushups || 0,
+                            db.stats.cardio || 0,
+                            (db.stats.burned || 0) / 10,
+                            db.stats.weight || 0
+                        ],
+                        borderColor: '#1a73e8',
+                        backgroundColor: 'rgba(26, 115, 232, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.35,
+                        pointBackgroundColor: '#00ffcc',
+                        pointBorderColor: '#1e1f22',
+                        pointHoverBackgroundColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            grid: { color: '#2f3136' },
+                            ticks: { color: '#9aa0a6', font: { family: 'monospace', size: 10 } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#e3e3e3', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChartMetricsEngine() {
+            if(!fitnessEvolutionChartInstance) return;
+            fitnessEvolutionChartInstance.data.datasets[0].data = [
+                db.stats.pushups || 0,
+                db.stats.cardio || 0,
+                (db.stats.burned || 0) / 10,
+                db.stats.weight || 0
+            ];
+            fitnessEvolutionChartInstance.update();
         }
 
         function openWeightModal() { forceWeightMode = true; openDrawer(); }
@@ -545,6 +944,12 @@
                     <select id="mediaType"><option value="Anime">Anime</option><option value="Seasons">Seasons</option><option value="Movies">Movies</option><option value="Cartoons">Cartoons</option></select>
                     <input type="text" id="mediaDetails" placeholder="Details (e.g. Ep 12, Watched)" />
                 `;
+            } else if (activeTab === 'workout') {
+                title.innerText = "Add Exercise Entry";
+                container.innerHTML = `<input type="text" id="workoutTitle" placeholder="e.g. Bench Press 3x10..." />`;
+            } else if (activeTab === 'rations') {
+                title.innerText = "Add Meal Entry";
+                container.innerHTML = `<input type="text" id="rationTitle" placeholder="e.g. Protein Shake..." />`;
             }
 
             document.getElementById('actionDrawer').classList.add('open');
@@ -559,8 +964,9 @@
             if (forceWeightMode) {
                 const wVal = parseFloat(document.getElementById('weightInput').value);
                 if (wVal > 0) db.stats.weight = wVal;
-                localStorage.setItem('prod_db_stats', JSON.stringify(db.stats));
+                localStorage.setItem(`db_${currentProfileKey}_stats`, JSON.stringify(db.stats));
                 syncStatDisplays();
+                updateChartMetricsEngine();
             } else if (activeTab === 'tasks') {
                 const txt = document.getElementById('taskTitle').value.trim();
                 const pVal = document.getElementById('taskPriority').value;
@@ -577,21 +983,31 @@
                 const det = document.getElementById('mediaDetails').value.trim() || "Added";
                 if (!txt) return;
                 db.media.push({ id: timestampID, text: txt, type: tVal, details: det });
+            } else if (activeTab === 'workout') {
+                const txt = document.getElementById('workoutTitle').value.trim();
+                if (!txt) return;
+                db.workout.push({ id: timestampID, text: txt });
+            } else if (activeTab === 'rations') {
+                const txt = document.getElementById('rationTitle').value.trim();
+                if (!txt) return;
+                db.rations.push({ id: timestampID, text: txt });
             }
 
-            localStorage.setItem(`prod_db_${activeTab}`, JSON.stringify(db[activeTab]));
+            localStorage.setItem(`db_${currentProfileKey}_${activeTab}`, JSON.stringify(db[activeTab]));
             closeDrawer();
             renderTabLists();
         }
 
         function deleteItem(id, targetBucket) {
             db[targetBucket] = db[targetBucket].filter(item => item.id !== id);
-            localStorage.setItem(`prod_db_${targetBucket}`, JSON.stringify(db[targetBucket]));
+            localStorage.setItem(`db_${currentProfileKey}_${targetBucket}`, JSON.stringify(db[targetBucket]));
             renderTabLists();
         }
 
         function renderTabLists() {
+            if (!currentProfileKey) return;
             document.getElementById('tasks-empty').style.display = 'none';
+            document.getElementById('goals-empty').style.display = 'none';
 
             if (activeTab === 'tasks') {
                 const activeContainer = document.getElementById('tasks-active-list');
@@ -637,13 +1053,41 @@
                     container.appendChild(card);
                 });
             }
+            else if (activeTab === 'workout') {
+                const container = document.getElementById('workout-active-list');
+                container.innerHTML = "";
+                db.workout.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'task-card';
+                    card.innerHTML = `
+                        <div class="task-content-block"><span class="task-title-text">${item.text}</span></div>
+                        <span style="cursor:pointer; opacity:0.4;" onclick="deleteItem(${item.id}, 'workout')">✕</span>
+                    `;
+                    container.appendChild(card);
+                });
+                syncStatDisplays();
+            }
+            else if (activeTab === 'rations') {
+                const container = document.getElementById('rations-active-list');
+                container.innerHTML = "";
+                db.rations.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'task-card';
+                    card.innerHTML = `
+                        <div class="task-content-block"><span class="task-title-text">${item.text}</span></div>
+                        <span style="cursor:pointer; opacity:0.4;" onclick="deleteItem(${item.id}, 'rations')">✕</span>
+                    `;
+                    container.appendChild(card);
+                });
+                syncStatDisplays();
+            }
         }
 
         function renderGoalsCountdownEngine() {
             const container = document.getElementById('goals-active-list');
             if (!container) return;
             container.innerHTML = "";
-            if(db.goals.length === 0) return;
+            if(db.goals.length === 0) { document.getElementById('goals-empty').style.display = 'flex'; return; }
 
             const now = Date.now();
 
@@ -675,8 +1119,8 @@
             });
         }
 
-        checkSystemAuthentication();
-        syncStatDisplays();
+        // Run persistent session auth router check on load
+        verifyStickyProfileRouter();
     </script>
 </body>
 </html>
