@@ -1,0 +1,11 @@
+{
+    "name": "ChronoForge",
+    "short_name": "ChronoForge",
+    "description": "Personal life & productivity command center",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#111214",
+    "theme_color": "#1a73e8",
+    "orientation": "portrait",
+    "icons": []
+}
